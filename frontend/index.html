@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Monitoring Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Site Monitoring Dashboard</h1>
+    </header>
+    <main>
+        <section id="metrics-section">
+            <h2>Metrics Overview</h2>
+            <div class="chart-container">
+                <canvas id="metricsChart"></canvas>
+            </div>
+        </section>
+        <section id="logs-section">
+            <h2>Recent Logs</h2>
+            <ul id="log-list">
+                </ul>
+        </section>
+    </main>
+    <script src="chart.js"></script>
+</body>
+</html>

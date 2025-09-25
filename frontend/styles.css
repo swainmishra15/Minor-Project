@@ -1,0 +1,44 @@
+body {
+    font-family: sans-serif;
+    background-color: #1a1a2e;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #162447;
+    padding: 20px;
+    text-align: center;
+}
+
+main {
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+section {
+    background-color: #1f4068;
+    padding: 20px;
+    border-radius: 8px;
+    flex: 1;
+}
+
+.chart-container {
+    background-color: #0b1c2b;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+#log-list {
+    list-style: none;
+    padding: 0;
+}
+
+#log-list li {
+    background-color: #2b3a55;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 4px;
+}
