@@ -1,3 +1,4 @@
+#classifying logs using simple keyword matching
 def classify_log(log_message: str) -> str:
     """
     A simple log classifier based on keywords.

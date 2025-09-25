@@ -1,29 +1,43 @@
 from fastapi import FastAPI
-from .db import engine, Base, SessionLocal
-from .models import Log, Metric
-from .ai_classifier import classify_log
+import sqlite3
+from datetime import datetime
+from ai_classifier import classify_log
 import uvicorn
+from pydantic import BaseModel
 
-app = FastAPI()
+app = FastAPI(title="Site Monitoring API")
+
+class LogRequest(BaseModel):
+    message: str
+    source: str
 
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the site monitoring dashboard API!"}
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
-@app.post("/metrics/")
-def create_metric(timestamp: str, name: str, value: float, tags: dict = None):
-    # This is a simplified example. In a real app, you would
-    # validate data and save to the database.
-    return {"status": "success", "metric": {"name": name, "value": value}}
-
 @app.post("/logs/")
-def create_log(timestamp: str, message: str, source: str):
-    log_class = classify_log(message)
-    # Save log to DB with its classification
-    return {"status": "success", "log": {"message": message, "class": log_class}}
+def create_log(log: LogRequest):
+    conn = sqlite3.connect('site_monitoring.db')
+    cursor = conn.cursor()
+    
+    classification = classify_log(log.message)
+    timestamp = datetime.now().isoformat()
+    
+    cursor.execute(
+        "INSERT INTO logs (timestamp, message, source, classification) VALUES (?, ?, ?, ?)",
+        (timestamp, log.message, log.source, classification)
+    )
+    conn.commit()
+    log_id = cursor.lastrowid
+    conn.close()
+    
+    return {
+        "id": log_id,
+        "timestamp": timestamp,
+        "message": log.message,
+        "source": log.source,
+        "classification": classification
+    }
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,0 +1,15 @@
+CREATE TABLE IF NOT EXISTS logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME NOT NULL,
+    message TEXT NOT NULL,
+    source TEXT NOT NULL,
+    classification TEXT
+);
+
+CREATE TABLE IF NOT EXISTS metrics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME NOT NULL,
+    name TEXT NOT NULL,
+    value REAL NOT NULL,
+    tags TEXT
+);
