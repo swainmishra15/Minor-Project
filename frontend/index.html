@@ -5,25 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Site Monitoring Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Site Monitoring Dashboard</h1>
-    </header>
-    <main>
-        <section id="metrics-section">
-            <h2>Metrics Overview</h2>
-            <div class="chart-container">
-                <canvas id="metricsChart"></canvas>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Site Monitoring Dashboard</h1>
+            <p>Real-time AI-powered log monitoring and analysis</p>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number error" id="errorCount">-</div>
+                <div>Errors</div>
             </div>
-        </section>
-        <section id="logs-section">
-            <h2>Recent Logs</h2>
-            <ul id="log-list">
-                </ul>
-        </section>
-    </main>
-    <script src="chart.js"></script>
+            <div class="stat-card">
+                <div class="stat-number warning" id="warningCount">-</div>
+                <div>Warnings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number info" id="infoCount">-</div>
+                <div>Info</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number other" id="totalCount">-</div>
+                <div>Total Logs</div>
+            </div>
+        </div>
+
+        <div class="logs-section">
+            <div class="logs-header">
+                <h2>📋 Recent Logs</h2>
+                <button class="refresh-btn" onclick="loadLogs()">🔄 Refresh</button>
+            </div>
+
+            <div id="loading" class="loading">Loading logs...</div>
+
+            <table class="log-table" id="logTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Timestamp</th>
+                        <th>Message</th>
+                        <th>Source</th>
+                        <th>Classification</th>
+                    </tr>
+                </thead>
+                <tbody id="logTableBody">
+                </tbody>
+            </table>
+
+            <div class="last-updated" id="lastUpdated"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
