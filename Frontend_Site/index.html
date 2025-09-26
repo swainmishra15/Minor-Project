@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechCorp Solutions - Leading Software Company</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <h1 class="logo">🚀 TechCorp</h1>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="products.html" class="nav-link">Products</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="#" class="nav-link" onclick="testAPI()">API Test</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Welcome to TechCorp Solutions</h1>
+                <p>Leading innovation in enterprise software and AI-powered monitoring systems</p>
+                <div class="cta-buttons">
+                    <button class="btn primary" onclick="loadDashboard()">View Dashboard</button>
+                    <button class="btn secondary" onclick="generateTraffic()">Generate Activity</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="services">
+            <h2>Our Services</h2>
+            <div class="service-grid">
+                <div class="service-card" onclick="trackClick('cloud-services')">
+                    <h3>☁️ Cloud Solutions</h3>
+                    <p>Scalable cloud infrastructure and monitoring</p>
+                </div>
+                <div class="service-card" onclick="trackClick('ai-ml')">
+                    <h3>🤖 AI & Machine Learning</h3>
+                    <p>Intelligent log classification and analysis</p>
+                </div>
+                <div class="service-card" onclick="trackClick('monitoring')">
+                    <h3>📊 System Monitoring</h3>
+                    <p>Real-time performance tracking with Prometheus</p>
+                </div>
+                <div class="service-card" onclick="trackClick('enterprise')">
+                    <h3>🏢 Enterprise Software</h3>
+                    <p>Custom business solutions and APIs</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <h2>Live System Stats</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3 id="totalLogs">0</h3>
+                    <p>Total Logs Processed</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="errorRate">0%</h3>
+                    <p>Error Rate</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="uptime">99.9%</h3>
+                    <p>System Uptime</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="responseTime">0ms</h3>
+                    <p>Avg Response Time</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 TechCorp Solutions. Monitoring system powered by AI.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
