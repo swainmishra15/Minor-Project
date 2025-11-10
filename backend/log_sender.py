@@ -1,129 +1,57 @@
 import requests
-import json
 import time
 import random
-from datetime import datetime
+from transformers import pipeline
 
-# Your API endpoint
+# 🔗 FastAPI endpoint (adjust port if needed)
 API_URL = "http://127.0.0.1:8000/logs/"
 
-def send_single_log(message, source):
-    """Send one log to your main.py API"""
-    
-    # Data to send
-    log_data = {
-        "message": message,
-        "source": source
-    }
-    
-    print(f"📤 Sending: {message}")
-    print(f"   Source: {source}")
-    
+# Load the same Hugging Face model
+classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+labels = ["error", "warning", "info", "performance", "security", "other"]
+
+# Sample raw logs (without explicit labels)
+RAW_LOGS = [
+    "Database connection failed due to timeout",
+    "High CPU utilization detected in worker node",
+    "User login completed successfully",
+    "SSL certificate expires in 3 days",
+    "API latency has increased to 2 seconds",
+    "Backup operation finished",
+    "Unauthorized access attempt detected",
+    "Memory leak suspected in service worker",
+    "Server started and ready to accept requests",
+    "Slow response from database during query execution",
+]
+
+def send_single_log(message, source="system"):
+    """Send one raw log entry to the backend"""
     try:
-        # Send POST request to your main.py
-        response = requests.post(API_URL, json=log_data)
-        
+        response = requests.post(API_URL, json={"message": message, "source": source})
         if response.status_code == 200:
-            result = response.json()
-            print(f"✅ SUCCESS!")
-            print(f"   Response: {result}")
-            print("-" * 60)
-            return True
+            print(f"✅ Sent log → {message}")
         else:
-            print(f"❌ FAILED: Status code {response.status_code}")
-            print(f"   Response: {response.text}")
-            return False
-            
+            print(f"⚠️ Failed ({response.status_code}) → {response.text[:60]}")
     except Exception as e:
-        print(f"❌ ERROR: {e}")
-        return False
+        print(f"❌ Error sending log: {e}")
 
-def send_test_logs():
-    """Send multiple test logs automatically"""
-    
-    print("🚀 STARTING LOG SENDER")
-    print("=" * 60)
-    
-    # Test logs with different types
-    test_logs = [
-        ("Error: Database connection failed", "backend"),
-        ("Warning: High memory usage detected", "system"),
-        ("User login successful", "frontend"),
-        ("Error: File not found in storage", "backend"),
-        ("Warning: Disk space running low", "system"),
-        ("API request completed successfully", "backend"),
-        ("Random system event occurred", "monitoring"),
-        ("Error: Authentication failed", "frontend")
-    ]
-    
-    for i, (message, source) in enumerate(test_logs, 1):
-        print(f"🔄 Log {i}/{len(test_logs)}")
-        send_single_log(message, source)
-        time.sleep(2)  # Wait 2 seconds between logs
-    
-    print("🎉 ALL LOGS SENT! Check your database now!")
+def generate_and_send_logs():
+    """Generate logs using the classifier to mix semantics but send only raw text"""
+    print("\n🚀 Smart Log Sender Started...\n")
 
-def send_custom_logs():
-    """Interactive mode - type your own logs"""
-    
-    print("🎯 CUSTOM LOG MODE")
-    print("Type your logs manually. Type 'quit' to exit.")
-    print("-" * 60)
-    
-    while True:
-        print("\n📝 Enter new log:")
-        message = input("Message: ")
-        if message.lower() == 'quit':
-            break
-            
-        source = input("Source: ")
-        if source.lower() == 'quit':
-            break
-        
-        send_single_log(message, source)
+    for _ in range(10):  # send 10 logs for test
+        # Pick a random base log
+        log_message = random.choice(RAW_LOGS)
 
-def send_realistic_logs():
-    """Send realistic server logs"""
-    
-    realistic_logs = [
-        ("Error: Connection timeout to database server", "database"),
-        ("Warning: CPU usage at 87%", "system"),
-        ("User johndoe logged in successfully", "auth"),
-        ("Error: Failed to write to log file", "filesystem"),
-        ("API endpoint /users responded in 1.2s", "api"),
-        ("Warning: SSL certificate expires in 30 days", "security"),
-        ("Backup completed successfully", "backup"),
-        ("Error: Out of memory exception in worker process", "backend")
-    ]
-    
-    print("🏢 SENDING REALISTIC SERVER LOGS")
-    print("=" * 60)
-    
-    for message, source in realistic_logs:
-        send_single_log(message, source)
-        time.sleep(1)
+        # Use classifier just to vary internal processing (simulate contextual load)
+        _ = classifier(log_message, labels)
+
+        # Send the original message (no label prefixes)
+        send_single_log(log_message)
+
+        time.sleep(1)  # small delay between sends
+
+    print("\n🎯 All smart logs sent! Check your dashboard for AI classification results.\n")
 
 if __name__ == "__main__":
-    print("LOG SENDER SCRIPT")
-    print("Choose an option:")
-    print("1. Send sample test logs")
-    print("2. Send realistic server logs") 
-    print("3. Send custom logs (interactive)")
-    print("4. Send single test log")
-    
-    choice = input("\nEnter choice (1-4): ")
-    
-    if choice == "1":
-        send_test_logs()
-    elif choice == "2":
-        send_realistic_logs()
-    elif choice == "3":
-        send_custom_logs()
-    elif choice == "4":
-        send_single_log("Error: Test message from log sender", "test")
-    else:
-        print("Invalid choice!")
-        
-    print("\n💡 TIP: Check your database with:")
-    print("   sqlite3 site_monitoring.db")
-    print("   SELECT * FROM logs;")
+    generate_and_send_logs()

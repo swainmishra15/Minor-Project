@@ -6,7 +6,8 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from database import init_database
 from routes import logs, health, stats
 from metrics import setup_metrics
-
+import os
+print(os.path.abspath('site_monitoring.db'))
 app = FastAPI(title="Site Monitoring API")
 
 # Initialize Prometheus

@@ -1,53 +1,62 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
+from database import get_db_connection
+from classifier import classify_log   # your Hugging Face classifier function
 from datetime import datetime
 
-from database import get_db_connection
-from models import LogRequest
-from classifier import classify_log
-from metrics import update_system_metrics
+router = APIRouter(prefix="/logs", tags=["Logs"])
 
-router = APIRouter()
-
-@router.post("/logs/")
-def create_log(log: LogRequest):
-    """Create a new log entry with AI classification + Prometheus metrics"""
+# -------------------------------
+# 🟢 POST /logs/ → Receive & Classify Logs
+# -------------------------------
+@router.post("/")
+async def receive_log(request: Request):
+    """
+    Receive incoming logs, classify them with AI, and store in PostgreSQL.
+    """
     try:
+        # Get incoming JSON data
+        data = await request.json()
+        message = data.get("message")
+        source = data.get("source", "unknown")
+
+        if not message:
+            return {"error": "Missing 'message' field in request"}
+
+        # AI classification (Hugging Face model)
+        classification = classify_log(message)
+
+        # Store in PostgreSQL
         conn = get_db_connection()
         cursor = conn.cursor()
-        
-        classification = classify_log(log.message)
-        timestamp = datetime.now().isoformat()
-        
         cursor.execute(
-            "INSERT INTO logs (timestamp, message, source, classification) VALUES (?, ?, ?, ?)",
-            (timestamp, log.message, log.source, classification)
+            "INSERT INTO logs (timestamp, message, source, classification) VALUES (%s, %s, %s, %s)",
+            (datetime.now(), message, source, classification)
         )
-        
         conn.commit()
-        log_id = cursor.lastrowid
+        cursor.close()
         conn.close()
-        
-        # Update system metrics
-        update_system_metrics()
-        
-        print(f"✅ Log created: {classification} - {log.message[:50]}...")
-        
-        return {
-            "id": log_id,
-            "timestamp": timestamp,
-            "message": log.message,
-            "source": log.source,
-            "classification": classification,
-            "status": "success"
-        }
-        
-    except Exception as e:
-        print(f"❌ Error creating log: {e}")
-        return {"error": str(e), "status": "failed"}
 
-@router.get("/logs/")
+        return {
+            "status": "success",
+            "message": message,
+            "source": source,
+            "classification": classification
+        }
+
+    except Exception as e:
+        print(f"❌ Error in /logs/: {e}")
+        return {"error": str(e)}
+
+
+# -------------------------------
+# 🔵 GET /logs/ → Fetch Latest Logs
+# -------------------------------
+@router.get("/")
 def get_logs():
-    """Get all logs from database"""
+    """
+    Fetch the latest 50 logs from PostgreSQL.
+    Useful for monitoring dashboards or API testing.
+    """
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -55,27 +64,64 @@ def get_logs():
             SELECT id, timestamp, message, source, classification
             FROM logs
             ORDER BY id DESC
-            LIMIT 50
+            LIMIT 50;
         """)
-        logs = cursor.fetchall()
+        rows = cursor.fetchall()
+        cursor.close()
         conn.close()
 
-        log_list = []
-        for log in logs:
-            log_list.append({
-                "id": log[0],
-                "timestamp": log[1],
-                "message": log[2],
-                "source": log[3],
-                "classification": log[4]
-            })
+        logs = [
+            {
+                "id": r[0],
+                "timestamp": r[1],
+                "message": r[2],
+                "source": r[3],
+                "classification": r[4]
+            }
+            for r in rows
+        ]
 
-        return {
-            "logs": log_list, 
-            "count": len(log_list),
-            "status": "success"
-        }
-        
+        return {"logs": logs}
+
     except Exception as e:
-        print(f"❌ Error getting logs: {e}")
-        return {"error": str(e), "status": "failed"}
+        print(f"❌ Error in GET /logs/: {e}")
+        return {"error": str(e)}
+
+
+# -------------------------------
+# 🟣 GET /logs/latest → Fetch Last 10 Logs
+# -------------------------------
+@router.get("/latest")
+def get_latest_logs():
+    """
+    Fetch the 10 most recent logs for quick view.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT id, timestamp, message, source, classification
+            FROM logs
+            ORDER BY id DESC
+            LIMIT 10;
+        """)
+        rows = cursor.fetchall()
+        cursor.close()
+        conn.close()
+
+        logs = [
+            {
+                "id": r[0],
+                "timestamp": r[1],
+                "message": r[2],
+                "source": r[3],
+                "classification": r[4]
+            }
+            for r in rows
+        ]
+
+        return {"latest_logs": logs}
+
+    except Exception as e:
+        print(f"❌ Error in /logs/latest: {e}")
+        return {"error": str(e)}

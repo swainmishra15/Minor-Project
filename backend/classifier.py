@@ -1,58 +1,34 @@
+# ============================================
+# AI-Powered Log Classifier using HuggingFace
+# ============================================
+
+from transformers import pipeline
+
+# Load model once at startup
+# (You can use smaller models like "valhalla/distilbart-mnli-12-1" if memory is limited)
+classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+
+# Define the categories you want the model to classify logs into
+LOG_LABELS = ["error", "warning", "info", "performance", "security", "other"]
+
 def classify_log(log_message: str) -> str:
-    """Enhanced AI classifier with more comprehensive rules"""
-    message_lower = log_message.lower()
-    
-    # Critical/Error patterns
-    error_keywords = [
-        'error', 'failed', 'failure', 'exception', 'crash', 'critical', 'fatal', 
-        'panic', 'abort', 'timeout', 'refused', 'denied', 'forbidden', 'unauthorized',
-        'not found', '404', '500', '503', 'internal server error', 'database error',
-        'connection failed', 'out of memory', 'disk full', 'permission denied',
-        'authentication failed', 'ssl error', 'certificate error', 'syntax error'
-    ]
-    
-    # Warning patterns  
-    warning_keywords = [
-        'warning', 'warn', 'deprecated', 'slow', 'retry', 'fallback', 'backup',
-        'high usage', 'low disk', 'memory usage', 'cpu usage', 'performance',
-        'certificate expires', 'ssl expires', 'quota exceeded', 'rate limit',
-        'unusual activity', 'suspicious', 'outdated', 'upgrade required',
-        'maintenance', 'restart required', 'configuration change'
-    ]
-    
-    # Success/Info patterns
-    success_keywords = [
-        'success', 'successful', 'completed', 'finished', 'done', 'ok', 'ready',
-        'started', 'initialized', 'connected', 'authenticated', 'authorized',
-        'login', 'logout', 'registered', 'created', 'updated', 'saved',
-        'backup completed', 'sync completed', 'deployment successful',
-        'healthy', 'online', 'available', 'operational'
-    ]
-    
-    # Security patterns
-    security_keywords = [
-        'security', 'breach', 'attack', 'intrusion', 'malware', 'virus',
-        'phishing', 'suspicious login', 'multiple failed logins', 'brute force',
-        'ddos', 'injection', 'xss', 'csrf', 'vulnerability', 'exploit'
-    ]
-    
-    # Performance patterns
-    performance_keywords = [
-        'slow query', 'high latency', 'response time', 'throughput', 'load balancer',
-        'scaling', 'auto-scale', 'performance degradation', 'optimization',
-        'cache hit', 'cache miss', 'memory leak', 'cpu spike'
-    ]
-    
-    # Check patterns in priority order
-    if any(keyword in message_lower for keyword in security_keywords):
-        return "security"
-    elif any(keyword in message_lower for keyword in error_keywords):
-        return "error"
-    elif any(keyword in message_lower for keyword in warning_keywords):
-        return "warning"
-    elif any(keyword in message_lower for keyword in performance_keywords):
-        return "performance"
-    elif any(keyword in message_lower for keyword in success_keywords):
-        return "info"
-    else:
+    """
+    Classify a log message into one of several categories
+    using a pre-trained zero-shot NLP model.
+    """
+    if not log_message or log_message.strip() == "":
         return "other"
+
+    # Run the HuggingFace zero-shot classification
+    result = classifier(log_message, LOG_LABELS)
+
+    # Extract the top predicted label
+    predicted_label = result["labels"][0]
+    confidence = result["scores"][0]
+
+    # Optional: only return label if confidence > threshold
+    if confidence < 0.5:
+        predicted_label = "other"
+
+    print(f"[LOG CLASSIFIER] Message: {log_message[:60]}... → {predicted_label} ({confidence:.2f})")
+    return predicted_label
