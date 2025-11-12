@@ -1,52 +1,56 @@
 from fastapi import APIRouter
-
 from database import get_db_connection
 
 router = APIRouter()
 
 @router.get("/stats/")
 def get_stats():
-    """Get statistics for dashboard"""
+    """Return all statistics for dashboard charts"""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
-        # Get classification counts
+
+        # Classification counts
         cursor.execute("""
-            SELECT classification, COUNT(*) as count
+            SELECT classification, COUNT(*) 
             FROM logs 
             GROUP BY classification
         """)
         classifications = dict(cursor.fetchall())
-        
-        # Get source counts
+
+        # Logs per source
         cursor.execute("""
-            SELECT source, COUNT(*) as count
+            SELECT source, COUNT(*) 
             FROM logs 
             GROUP BY source
-            ORDER BY count DESC
+            ORDER BY COUNT(*) DESC 
             LIMIT 10
         """)
         sources = dict(cursor.fetchall())
-        
-        # Get recent activity
+
+        # Trend (last few intervals)
         cursor.execute("""
-            SELECT COUNT(*) as count
-            FROM logs 
-            WHERE datetime(timestamp) >= datetime('now', '-1 hour')
+            SELECT strftime('%H:%M', timestamp) AS time_label, COUNT(*) 
+            FROM logs
+            WHERE timestamp >= datetime('now', '-25 minutes')
+            GROUP BY time_label
+            ORDER BY time_label ASC
         """)
-        recent_count = cursor.fetchone()[0]
-        
+        trend_data = cursor.fetchall()
+        log_labels = [row[0] for row in trend_data]
+        log_trend = [row[1] for row in trend_data]
+
         conn.close()
-        
+
         return {
-            "classifications": classifications,
-            "sources": sources,
-            "total_logs": sum(classifications.values()),
-            "recent_hour": recent_count,
+            "log_labels": log_labels,
+            "log_trend": log_trend,
+            "log_classification": classifications,
+            "log_per_source": sources,
+            "total_logs": sum(classifications.values()) if classifications else 0,
             "status": "success"
         }
-        
+
     except Exception as e:
-        print(f"❌ Error getting stats: {e}")
+        print(f"❌ Error generating stats: {e}")
         return {"error": str(e), "status": "failed"}

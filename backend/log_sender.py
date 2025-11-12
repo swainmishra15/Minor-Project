@@ -13,16 +13,27 @@ labels = ["error", "warning", "info", "performance", "security", "other"]
 # Sample raw logs (without explicit labels)
 RAW_LOGS = [
     "Database connection failed due to timeout",
-    "High CPU utilization detected in worker node",
-    "User login completed successfully",
+    "Disk space full on server node-1",
+    "Failed to write data to PostgreSQL database",
+    "Out of memory exception in process scheduler",
+    "High CPU utilization detected in backend worker",
+    "Memory usage exceeds 85% on node-3",
     "SSL certificate expires in 3 days",
-    "API latency has increased to 2 seconds",
-    "Backup operation finished",
-    "Unauthorized access attempt detected",
-    "Memory leak suspected in service worker",
+    "Disk space running low on /var partition",
+    "User login completed successfully",
     "Server started and ready to accept requests",
+    "Backup operation finished successfully",
+    "API endpoint /health returned 200 OK",
     "Slow response from database during query execution",
+    "API latency increased to 2.5 seconds",
+    "Load balancer redistributed requests evenly",
+    "Optimized caching mechanism activated",
+    "Unauthorized access attempt detected from IP 192.168.1.10",
+    "Multiple failed login attempts detected for user admin",
+    "Firewall rule updated successfully",
+    "SSL certificate renewed successfully"
 ]
+
 
 def send_single_log(message, source="system"):
     """Send one raw log entry to the backend"""

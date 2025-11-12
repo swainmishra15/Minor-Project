@@ -1,11 +1,5 @@
-# ============================================
-# AI-Powered Log Classifier using HuggingFace
-# ============================================
-
 from transformers import pipeline
 
-# Load model once at startup
-# (You can use smaller models like "valhalla/distilbart-mnli-12-1" if memory is limited)
 classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
 
 # Define the categories you want the model to classify logs into
