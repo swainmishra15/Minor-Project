@@ -138,12 +138,10 @@ python log_sender.py
 
 ---
 
-## 📝 License
-
-This project is part of an academic initiative and is available for educational purposes.
-
----
 
 ## 👥 Team
 
-Developed by a dedicated team of three students under faculty mentorship.
+For further connection you can meet us here
+[Uday Gangal](https://www.linkedin.com/in/uday-gangal-085877347/)
+[Swain Mishra](https://www.linkedin.com/in/swain-mishra-a14b56270/)
+[Shikhar Misra](https://www.linkedin.com/in/shikhar-misra-6a692a278/)
