@@ -142,6 +142,9 @@ python log_sender.py
 ## 👥 Team
 
 For further connection you can meet us here
+
 [Uday Gangal](https://www.linkedin.com/in/uday-gangal-085877347/)
+
 [Swain Mishra](https://www.linkedin.com/in/swain-mishra-a14b56270/)
+
 [Shikhar Misra](https://www.linkedin.com/in/shikhar-misra-6a692a278/)
